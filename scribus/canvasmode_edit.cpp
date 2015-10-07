@@ -329,6 +329,7 @@ void CanvasMode_Edit::mouseDoubleClickEvent(QMouseEvent *m)
 		//otherwise, select between the whitespace
 		else
 		{
+            // ctrl
 			if (m->modifiers() & Qt::ControlModifier)
 			{
 				int start=0, stop=0;
@@ -349,7 +350,7 @@ void CanvasMode_Edit::mouseDoubleClickEvent(QMouseEvent *m)
 					}
 				}
 				else
-				{//Double click with Ctrl in a frame to select a paragraph
+				{ //Double click with Ctrl in a frame to select a paragraph #todo trigger on triple-click
 					oldCp = currItem->itemText.cursorPosition();
 					uint nrPar = currItem->itemText.nrOfParagraph(oldCp);
 					start = currItem->itemText.startOfParagraph(nrPar);
@@ -359,17 +360,22 @@ void CanvasMode_Edit::mouseDoubleClickEvent(QMouseEvent *m)
 				currItem->itemText.extendSelection(start, stop);
 				currItem->itemText.setCursorPosition(stop);
 			}
+            // edit marks
 			else if ((currItem->itemText.cursorPosition() < currItem->itemText.length()) && (currItem->itemText.hasMark(currItem->itemText.cursorPosition())))
 			{	//invoke edit marker dialog
 				m_ScMW->slotEditMark();
 				return;
 			}
+            // no modifier - double click in a frame to select a word
 			else
-			{	//Double click in a frame to select a word
+			{
+                // save cursor pos for later
 				oldCp = currItem->itemText.cursorPosition();
+                // cursor pos in range of itemText?
 				bool validPos = (oldCp >= 0 && oldCp < currItem->itemText.length());
 				if (validPos && currItem->itemText.hasObject(oldCp))
 				{
+                    // Q. what is the meaning of the 1 here for arg 2 (len) in select()? 1 word?? ~ murftown
 					currItem->itemText.select(oldCp, 1, true);
 					PageItem *iItem = currItem->itemText.object(oldCp);
 					m_ScMW->editInlineStart(iItem->inlineCharID);

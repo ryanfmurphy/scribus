@@ -1582,6 +1582,8 @@ int StoryText::selectWord(int pos)
 
 void StoryText::select(int pos, uint len, bool on)
 {
+    // Q. what does len mean? chars? words? but why is it sometimes called with 1? ~ murftown
+
 	if (pos < 0)
 		pos += length();
 
@@ -1595,11 +1597,13 @@ void StoryText::select(int pos, uint len, bool on)
 //		that->at(i)->cselect = on;
 
 	if (on) {
-		// extend if possible
+		// extend existing selection if possible
 		if (selected(pos - 1))
 			m_selLast = qMax(m_selLast, pos + static_cast<int>(len) - 1);
 		else if (selected(pos + len))
 			m_selFirst = qMin(m_selFirst, pos);
+
+        // new selection from scratch
 		else {
 			m_selFirst = pos;
 			m_selLast = pos + len - 1;
@@ -1608,7 +1612,8 @@ void StoryText::select(int pos, uint len, bool on)
 	else {
 		if (pos <= m_selFirst && m_selLast < pos + signed(len))
 			deselectAll();
-		// shrink
+
+		// shrink existing selection
 		else if (!selected(pos - 1) && selected(pos + len - 1))
 			m_selFirst = pos + len;
 		else if (selected(pos) && !selected(pos + len))
