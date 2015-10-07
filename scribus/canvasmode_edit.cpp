@@ -314,24 +314,29 @@ void CanvasMode_Edit::deactivate(bool forGesture)
 
 void CanvasMode_Edit::mouseDoubleClickEvent(QMouseEvent *m)
 {
+    printf("mouseDoubleClickEvent()\n");
 	m->accept();
 	m_canvas->m_viewMode.m_MouseButtonPressed = false;
 	m_canvas->resetRenderMode();
 	PageItem *currItem = 0;
 	if (GetItem(&currItem) && (m_doc->appMode == modeEdit) && currItem->asTextFrame())
 	{
+        printf(" mouseDoubleClickEvent - in text frame\n");
 		//CB if annotation, open the annotation dialog
 		if (currItem->isAnnotation())
 		{
+            printf("  CB if annotation, open the annotation dialog\n");
 		//	qApp->changeOverrideCursor(QCursor(Qt::ArrowCursor));
 			m_view->requestMode(submodeAnnotProps);
 		}
 		//otherwise, select between the whitespace
 		else
 		{
+            printf("  otherwise, select between the whitespace\n");
             // ctrl
 			if (m->modifiers() & Qt::ControlModifier)
 			{
+                printf("    ctrl modifier\n");
 				int start=0, stop=0;
 
 				if (m->modifiers() & Qt::ShiftModifier)
@@ -363,24 +368,27 @@ void CanvasMode_Edit::mouseDoubleClickEvent(QMouseEvent *m)
             // edit marks
 			else if ((currItem->itemText.cursorPosition() < currItem->itemText.length()) && (currItem->itemText.hasMark(currItem->itemText.cursorPosition())))
 			{	//invoke edit marker dialog
+                printf("    invoke edit marker dialog\n");
 				m_ScMW->slotEditMark();
 				return;
 			}
             // no modifier - double click in a frame to select a word
 			else
 			{
+                printf("    no modifier - double click in a frame to select a word\n");
                 // save cursor pos for later
 				oldCp = currItem->itemText.cursorPosition();
                 // cursor pos in range of itemText?
 				bool validPos = (oldCp >= 0 && oldCp < currItem->itemText.length());
-				if (validPos && currItem->itemText.hasObject(oldCp))
+				if (validPos && currItem->itemText.hasObject(oldCp)) // select nothing / "almost nothing" ??
 				{
                     // Q. what is the meaning of the 1 here for arg 2 (len) in select()? 1 word?? ~ murftown
+                    printf("      itemText.select(oldCp, 1, true) - why len 1\n");
 					currItem->itemText.select(oldCp, 1, true);
 					PageItem *iItem = currItem->itemText.object(oldCp);
 					m_ScMW->editInlineStart(iItem->inlineCharID);
 				}
-				else
+				else // select word
 				{
 					int newPos = currItem->itemText.selectWord(oldCp);
 					currItem->itemText.setCursorPosition(newPos);
