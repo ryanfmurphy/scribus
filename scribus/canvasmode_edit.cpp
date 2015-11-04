@@ -334,7 +334,9 @@ void CanvasMode_Edit::mouseDoubleClickEvent(QMouseEvent *m)
 		{
             printf("  otherwise, select between the whitespace\n");
             // ctrl
-			if (m->modifiers() & Qt::ControlModifier)
+			bool do_select_paragraph =
+				(m->modifiers() & Qt::ControlModifier) || CanvasMode_Edit::isTripleClick(m);
+			if (do_select_paragraph)
 			{
                 printf("    ctrl modifier\n");
 				int start=0, stop=0;
@@ -402,6 +404,41 @@ void CanvasMode_Edit::mouseDoubleClickEvent(QMouseEvent *m)
 		mousePressEvent(m);
 		return;
 	}
+}
+
+/*
+even though this tripleClickTimer stuff built without errors,
+we Crashed, error msg =
+
+dyld: Symbol not found: __ZN15CanvasMode_Edit16tripleClickTimerE
+  Referenced from: /Applications/Scribus1.5.1.svn.app/Contents/MacOS/Scribus
+  Expected in: flat namespace
+ in /Applications/Scribus1.5.1.svn.app/Contents/MacOS/Scribus
+Trace/BPT trap: 5
+*/
+
+bool CanvasMode_Edit::initTripleClickTimer() {
+	CanvasMode_Edit::tripleClickTimer.start();
+	CanvasMode_Edit::TRIPLE_CLICK_TIME = 50;
+}
+
+bool CanvasMode_Edit::isTripleClick(QMouseEvent *m) {
+	printf("CanvasMode_Edit\n");
+	if (CanvasMode_Edit::tripleClickTimer.elapsed() > 0
+		&& CanvasMode_Edit::tripleClickTimer.elapsed() <= CanvasMode_Edit::TRIPLE_CLICK_TIME
+	)
+		// && !QElapsedTimer::hasExpired(qint64 CanvasMode_Edit::TRIPLE_CLICK_TIME)
+		//&& (this is a Single Click)
+	{
+		printf("  Triple Click!\n");
+		CanvasMode_Edit::tripleClickTimer.invalidate();
+		return true;
+	}
+	else if (m->type() == QEvent::MouseButtonDblClick) {
+		printf("  Double Click, starting tripleClickTimer\n");
+		CanvasMode_Edit::initTripleClickTimer();
+	}
+	return false;
 }
 
 

@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QTime>
+#include <QElapsedTimer>
 
 #include "canvasmode.h"
 #include "fpointarray.h"
@@ -56,6 +57,9 @@ public:
 
 	virtual void drawControls(QPainter* p);
 
+	static bool initTripleClickTimer();
+	static bool isTripleClick(QMouseEvent *m);
+
 // protected:
 // 	void setResizeCursor(int how, double rot = 0.0);
 
@@ -78,6 +82,9 @@ private:
 	double mRulerGuide;
 	bool m_longCursorTime;
 	bool m_keyRepeat;
+
+	static qint64 TRIPLE_CLICK_TIME;
+	static QElapsedTimer tripleClickTimer;
 
 private slots:
 	void blinkTextCursor();

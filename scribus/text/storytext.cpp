@@ -1582,7 +1582,7 @@ int StoryText::selectWord(int pos)
 
 void StoryText::select(int pos, uint len, bool on)
 { 
-    printf("        StoryText::select(%d,%d)\n", pos, len);
+    //printf("        StoryText::select(%d,%d)\n", pos, len);
     // Q. what does len mean? chars - but why is it sometimes called with 1? for modifying existing selection? ~ murftown
 
 	if (pos < 0)
@@ -1598,42 +1598,42 @@ void StoryText::select(int pos, uint len, bool on)
 //		that->at(i)->cselect = on;
 
 	if (on) {
-        printf("          StoryText::select - on\n");
+        //printf("          StoryText::select - on\n");
 		// extend existing selection if possible
 		if (selected(pos - 1)) {
-            printf("            StoryText::select - setting selLast only - in if selected(pos - 1)\n");
+            //printf("            StoryText::select - setting selLast only - in if selected(pos - 1)\n");
 			m_selLast = qMax(m_selLast, pos + static_cast<int>(len) - 1);
         }
 		else if (selected(pos + len)) {
-            printf("            StoryText::select - setting selFirst only - else if selected(pos + len)\n");
+            //printf("            StoryText::select - setting selFirst only - else if selected(pos + len)\n");
 			m_selFirst = qMin(m_selFirst, pos);
         }
 
         // new selection from scratch
 		else {
-            printf("            StoryText::select - setting selFirst and selLast - else\n");
+            //printf("            StoryText::select - setting selFirst and selLast - else\n");
 			m_selFirst = pos;
 			m_selLast = pos + len - 1;
 		}
 	}
 	else {
-        printf("          StoryText::select - not on\n");
+        //printf("          StoryText::select - not on\n");
 		if (pos <= m_selFirst && m_selLast < pos + signed(len)) {
-            printf("            StoryText::select - pos <= m_selFirst && m_selLast < pos + signed(len)\n");
+            //printf("            StoryText::select - pos <= m_selFirst && m_selLast < pos + signed(len)\n");
 			deselectAll();
         }
 
 		// shrink existing selection
 		else if (!selected(pos - 1) && selected(pos + len - 1)) {
-            printf("            StoryText::select - else if (!selected(pos - 1) && selected(pos + len - 1))\n");
+            //printf("            StoryText::select - else if (!selected(pos - 1) && selected(pos + len - 1))\n");
 			m_selFirst = pos + len;
         }
 		else if (selected(pos) && !selected(pos + len)) {
-            printf("            StoryText::select - else if (selected(pos) && !selected(pos + len))\n");
+            //printf("            StoryText::select - else if (selected(pos) && !selected(pos + len))\n");
 			m_selLast = pos - 1;
         }
 		else if (selected(pos) || selected(pos + len - 1)) {
-            printf("            StoryText::select - Grrr\n");
+            //printf("            StoryText::select - Grrr\n");
 			// Grr, deselection splits selection
 			m_selLast = pos - 1;
         }
